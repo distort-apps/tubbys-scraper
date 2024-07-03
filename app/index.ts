@@ -3,10 +3,18 @@ import { Page } from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs';
 import cheerio from 'cheerio';
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv'
+
+dotenv.config() 
 
 puppeteer.use(StealthPlugin());
 
 const endpoint = 'https://dice.fm/venue/tubbys-kingston-8qa5';
+
+const mongoUri = process.env.MONGO_URI;
+const dbName = process.env.DB_NAME;
+const collectionName = process.env.COLLECTION_NAME;
 
 interface EventDetails {
   title: string | null;
@@ -243,6 +251,28 @@ const scrapeEventDetails = async (page: Page, link: string): Promise<EventDetail
   } catch (error) {
     console.error(`Error scraping details from ${link}: `, error);
     return null;
+  }
+};
+
+// Connect to MongoDB and insert scraped data
+const insertDataToMongoDB = async (events: EventDetails[]) => {
+  if (!mongoUri || !dbName || !collectionName) {
+    throw new Error('Missing MongoDB connection information');
+  }
+
+  const client = new MongoClient(mongoUri);
+
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    await collection.insertMany(events);
+    console.log('Data inserted to MongoDB');
+  } catch (error) {
+    console.error('Error inserting data to MongoDB: ', error);
+  } finally {
+    await client.close();
   }
 };
 
