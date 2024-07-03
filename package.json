@@ -9,9 +9,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^20.14.9",
+    "@types/puppeteer": "^7.0.4",
     "cheerio": "^1.0.0-rc.12",
     "puppeteer": "^22.12.1",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "typescript": "^5.5.3"
   }
 }
