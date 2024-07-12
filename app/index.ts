@@ -163,13 +163,18 @@ const scrapeEventDetails = async (page: Page, link: string): Promise<EventDetail
     }
 
     try {
-      price = await page.$eval(
-        'div.EventDetailsCallToAction__PriceRow-sc-3e9a4f58-1 span',
-        el => el?.textContent?.trim() || ''
+      price = await page.$eval('meta[property="product:price:amount"]', el =>
+        el.content.trim()
       );
     } catch (err) {
-      console.error(`Error finding price: `, err);
-      price = null;
+      try {
+        price = await page.$eval(
+          'div.EventDetailsTitle__Price-sc-8ebcf47a-3',
+          el => el?.textContent?.trim() || ''
+        );
+      } catch (err) {
+        price = null;
+      }
     }
 
     try {
